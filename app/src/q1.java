@@ -2,36 +2,56 @@ import java.util.*;
 
 /**
  * Book My Stay App
- * Use Case 7: Add-On Service Selection
+ * Use Case 8: Booking History & Reporting
  *
- * Demonstrates optional service selection using
- * Map and List data structures.
+ * Demonstrates booking history tracking and report generation.
  *
  * @author Muskan
- * @version 7.0
+ * @version 8.0
  */
 
-// Service class
-class Service {
-    private String serviceName;
-    private double cost;
+// Reservation class
+class Reservation {
+    private String reservationId;
+    private String guestName;
+    private String roomType;
 
-    public Service(String serviceName, double cost) {
-        this.serviceName = serviceName;
-        this.cost = cost;
+    public Reservation(String reservationId, String guestName, String roomType) {
+        this.reservationId = reservationId;
+        this.guestName = guestName;
+        this.roomType = roomType;
     }
 
-    public double getCost() {
-        return cost;
+    public String getReservationId() {
+        return reservationId;
     }
 
-    public String getServiceName() {
-        return serviceName;
+    public String getGuestName() {
+        return guestName;
+    }
+
+    public String getRoomType() {
+        return roomType;
     }
 
     @Override
     public String toString() {
-        return serviceName + " (₹" + cost + ")";
+        return "Reservation ID: " + reservationId +
+                ", Guest: " + guestName +
+                ", Room Type: " + roomType;
+    }
+}
+
+// Report service class
+class BookingReportService {
+    public void generateReport(List<Reservation> history) {
+        System.out.println("\n--- Booking History Report ---");
+
+        for (Reservation reservation : history) {
+            System.out.println(reservation);
+        }
+
+        System.out.println("\nTotal Confirmed Bookings: " + history.size());
     }
 }
 
@@ -39,18 +59,19 @@ public class q1 {
 
     public static void main(String[] args) {
 
-        // Reservation ID
-        String reservationId = "RES101";
+        // Booking history list (ordered)
+        List<Reservation> bookingHistory = new ArrayList<>();
 
-        // Selected services list
-        List<Service> selectedServices = new ArrayList<>();
+        // Add confirmed bookings
+        bookingHistory.add(new Reservation("RES101", "Aarav", "Single"));
+        bookingHistory.add(new Reservation("RES102", "Diya", "Double"));
+        bookingHistory.add(new Reservation("RES103", "Rohan", "Suite"));
 
-        selectedServices.add(new Service("Breakfast", 500));
-        selectedServices.add(new Service("Airport Pickup", 1200));
-        selectedServices.add(new Service("Spa Access", 1500));
+        System.out.println("Welcome to Book My Stay App");
+        System.out.println("Hotel Booking System v8.0");
 
-        // Mapping reservation -> services
-        Map<String, List<Service>> reservationServices = new HashMap<>();
-        reservationServices.put(reservationId, selectedServices);
-
-        // Calculate total add-on cost
+        // Admin requests report
+        BookingReportService reportService = new BookingReportService();
+        reportService.generateReport(bookingHistory);
+    }
+}
