@@ -1,79 +1,78 @@
+import java.util.*;
+
 /**
  * Book My Stay App
- * Use Case 2: Basic Room Types & Static Availability
+ * Use Case 6: Reservation Confirmation & Room Allocation
  *
- * Demonstrates abstraction, inheritance, and static availability.
+ * Demonstrates FIFO booking processing, unique room allocation,
+ * and prevention of double-booking.
  *
  * @author Muskan
- * @version 2.0
+ * @version 6.0
  */
-
-// Abstract class
-abstract class Room {
-    protected String roomType;
-    protected int beds;
-    protected double price;
-
-    public Room(String roomType, int beds, double price) {
-        this.roomType = roomType;
-        this.beds = beds;
-        this.price = price;
-    }
-
-    public void displayDetails() {
-        System.out.println("Room Type: " + roomType);
-        System.out.println("Beds: " + beds);
-        System.out.println("Price per night: ₹" + price);
-    }
-}
-
-// Single Room class
-class SingleRoom extends Room {
-    public SingleRoom() {
-        super("Single Room", 1, 2000);
-    }
-}
-
-// Double Room class
-class DoubleRoom extends Room {
-    public DoubleRoom() {
-        super("Double Room", 2, 3500);
-    }
-}
-
-// Suite Room class
-class SuiteRoom extends Room {
-    public SuiteRoom() {
-        super("Suite Room", 3, 6000);
-    }
-}
-
-// Main class
 public class q1 {
+
     public static void main(String[] args) {
 
-        // Creating room objects
-        Room single = new SingleRoom();
-        Room doubleRoom = new DoubleRoom();
-        Room suite = new SuiteRoom();
+        // Queue for booking requests (FIFO)
+        Queue<String> bookingQueue = new LinkedList<>();
 
-        // Static availability variables
-        int singleAvailable = 5;
-        int doubleAvailable = 3;
-        int suiteAvailable = 2;
+        bookingQueue.add("Single");
+        bookingQueue.add("Double");
+        bookingQueue.add("Suite");
+
+        // Inventory count
+        HashMap<String, Integer> inventory = new HashMap<>();
+        inventory.put("Single", 2);
+        inventory.put("Double", 1);
+        inventory.put("Suite", 1);
+
+        // Stores all allocated room IDs (global uniqueness)
+        Set<String> allocatedRoomIds = new HashSet<>();
+
+        // Maps room type -> allocated room IDs
+        HashMap<String, Set<String>> roomAllocations = new HashMap<>();
 
         System.out.println("Welcome to Book My Stay App");
-        System.out.println("Hotel Booking System v2.0\n");
+        System.out.println("Hotel Booking System v6.0\n");
 
-        single.displayDetails();
-        System.out.println("Available Rooms: " + singleAvailable);
-        System.out.println();
+        int roomCounter = 101;
 
-        doubleRoom.displayDetails();
-        System.out.println("Available Rooms: " + doubleAvailable);
-        System.out.println();
+        while (!bookingQueue.isEmpty()) {
+            String roomType = bookingQueue.poll(); // dequeue FIFO
 
-        suite.displayDetails();
-        System.out.println("Available Rooms: " + suiteAvailable);
+            int available = inventory.get(roomType);
+
+            if (available > 0) {
+                String roomId = roomType.substring(0, 1) + roomCounter;
+
+                // uniqueness check
+                if (!allocatedRoomIds.contains(roomId)) {
+
+                    // add room id globally
+                    allocatedRoomIds.add(roomId);
+
+                    // add room id to room type map
+                    roomAllocations.putIfAbsent(roomType, new HashSet<>());
+                    roomAllocations.get(roomType).add(roomId);
+
+                    // decrement inventory immediately
+                    inventory.put(roomType, available - 1);
+
+                    System.out.println("Booking Confirmed");
+                    System.out.println("Room Type: " + roomType);
+                    System.out.println("Allocated Room ID: " + roomId);
+                    System.out.println("Remaining: " + inventory.get(roomType));
+                    System.out.println();
+
+                    roomCounter++;
+                }
+            } else {
+                System.out.println("No rooms available for " + roomType);
+                System.out.println();
+            }
+        }
+
+        System.out.println("Final Allocations: " + roomAllocations);
     }
 }
